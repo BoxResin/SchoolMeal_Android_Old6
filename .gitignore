@@ -1,0 +1,14 @@
+# 빌드 파일
+build/
+
+# 프로젝트 설정 파일
+.idea/
+*.iml
+local.properties
+
+# Gradle 생성 파일
+.gradle/
+
+# OS 관련 파일
+.DS_Store
+Thumbs.db

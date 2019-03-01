@@ -1,0 +1,5 @@
+<!-- 문자열 리소스 -->
+<resources>
+    <!-- 앱 이름 -->
+    <string name="app_name">급식</string>
+</resources>
