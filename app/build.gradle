@@ -47,4 +47,5 @@ dependencies {
 
     // 테스트
     testImplementation 'junit:junit:4.12'
+    testImplementation 'io.mockk:mockk:1.9.1'
 }
