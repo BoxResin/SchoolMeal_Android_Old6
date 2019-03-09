@@ -4,6 +4,7 @@
  */
 package winapi251.app.schoolmeal.ui.main
 
+import winapi251.app.schoolmeal.datetime.TimePoint
 import winapi251.app.schoolmeal.model.meal.Dish
 import winapi251.app.schoolmeal.model.meal.Nutrient
 
@@ -77,6 +78,33 @@ class DailyMealView {
 
     /** 로딩을 숨기거나 보여준다. */
     fun showLoading(visible: Boolean): Unit = TODO()
+}
+
+/**
+ * 일일 급식 프레젠터
+ * @param date 급식을 보여줄 날짜
+ */
+class DailyMealPresenter(
+    private val view: DailyMealView,
+    private val date: TimePoint
+) {
+    /**
+     * 보기 모드가 선택될 때 호출된다.
+     * @param mode 선택된 보기 모드
+     */
+    fun onSelectMode(mode: DailyMealView.Mode): Unit = TODO()
+
+    /**
+     * 식사 시간 탭이 선택될 때 호출된다.
+     * @param mealTime 선택된 식사 시간
+     */
+    fun onSelectMealTimeTab(mealTime: MealTime): Unit = TODO()
+
+    /** 오류창에서 다운로드 버튼을 클릭할 때 호출된다. */
+    fun onClickDownloadInError(): Unit = TODO()
+
+    /** 스낵 바에서 다운로드 버튼을 클릭할 때 호출된다. */
+    fun onClickDownloadInSnackBar(): Unit = TODO()
 }
 
 /** 식사 시간 */
