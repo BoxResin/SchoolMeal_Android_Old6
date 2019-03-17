@@ -4,6 +4,9 @@
  */
 package winapi251.app.schoolmeal.model.meal
 
+/** 일일 급식 정보 */
+class DailyMeal
+
 /** 반찬 정보 */
 class Dish
 

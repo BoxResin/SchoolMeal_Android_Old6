@@ -1,8 +1,6 @@
 package winapi251.app.schoolmeal.ui.main
 
-import io.mockk.mockk
-import io.mockk.unmockkAll
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -21,6 +19,8 @@ class DailyMealPresenterTest {
         Config.school.send(mockk())
         Config.dailyMealViewMode.send(DailyMealView.Mode.MEAL_MENU)
         Config.mealTime.send(MealTime.LUNCH)
+
+        mockkObject(MealDatabase)
     }
 
     @After
@@ -50,6 +50,23 @@ class DailyMealPresenterTest {
                 message = "학교를 설정해주세요",
                 buttonText = "학교 설정",
                 onClick = presenter::onClickConfigSchoolInError
+            )
+        }
+    }
+
+    /** 저장된 일일 급식 정보가 없을 때 */
+    @Test
+    fun noDailyMeal() {
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns null
+
+        val view: DailyMealView = mockk()
+        val presenter = DailyMealPresenter(view, timePoint)
+
+        verify {
+            view.showError(
+                message = "급식 정보를 다운로드하세요.",
+                buttonText = "다운로드",
+                onClick = presenter::onClickDownloadInError
             )
         }
     }
