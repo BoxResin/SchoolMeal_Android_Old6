@@ -8,6 +8,7 @@ import org.junit.Before
 import org.junit.Test
 import winapi251.app.schoolmeal.Config
 import winapi251.app.schoolmeal.datetime.TimePoint
+import winapi251.app.schoolmeal.model.meal.DailyMeal
 
 @ExperimentalCoroutinesApi
 class DailyMealPresenterTest {
@@ -67,6 +68,24 @@ class DailyMealPresenterTest {
                 message = "급식 정보를 다운로드하세요.",
                 buttonText = "다운로드",
                 onClick = presenter::onClickDownloadInError
+            )
+        }
+    }
+
+    /** 저장된 일일 급식 정보가 오래되었을 때 */
+    @Test
+    fun oldDailyMeal() {
+        val mockDailyMeal = DailyMeal(savedTime = TimePoint(2019, 2, 15))
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns mockDailyMeal
+
+        val view: DailyMealView = mockk()
+        val presenter = DailyMealPresenter(view, timePoint)
+
+        verify {
+            view.showSnackBar(
+                message = "급식 정보가 오래되었습니다.\n마지막 다운로드 18일 전",
+                buttonText = "새로고침",
+                onClick = presenter::onClickDownloadInSnackBar
             )
         }
     }
