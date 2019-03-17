@@ -36,4 +36,21 @@ class DailyMealPresenterTest {
 
         verify { view.setDateText("3월 5일 (화)") }
     }
+
+    /** 설정된 학교가 없을 때 */
+    @Test
+    fun noSchool(): Unit = runBlocking {
+        Config.school.send(null)
+
+        val view: DailyMealView = mockk()
+        val presenter = DailyMealPresenter(view, timePoint)
+
+        verify {
+            view.showError(
+                message = "학교를 설정해주세요",
+                buttonText = "학교 설정",
+                onClick = presenter::onClickConfigSchoolInError
+            )
+        }
+    }
 }

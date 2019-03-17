@@ -100,6 +100,9 @@ class DailyMealPresenter(
      */
     fun onSelectMealTimeTab(mealTime: MealTime): Unit = TODO()
 
+    /** 오류창에서 학교 설정 버튼을 클릭할 때 호출된다. */
+    fun onClickConfigSchoolInError(): Unit = TODO()
+
     /** 오류창에서 다운로드 버튼을 클릭할 때 호출된다. */
     fun onClickDownloadInError(): Unit = TODO()
 
