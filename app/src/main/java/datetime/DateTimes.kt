@@ -8,5 +8,13 @@ package winapi251.app.schoolmeal.datetime
  * 시간 점
  *
  * 특정 시각을 나타낸다.
+ *
+ * @param year 년
+ * @param month 월
+ * @param day 일
  */
-class TimePoint
+class TimePoint(
+    year: Int,
+    month: Int,
+    day: Int
+)
