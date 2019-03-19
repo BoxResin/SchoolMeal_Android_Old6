@@ -202,6 +202,44 @@ class DailyMealPresenterTest {
         verify { view.showMealTimeTab(MealTime.DINNER, visible = true) }
     }
 
+    /** 올바른 식사 시간 탭을 선택하는지 검사한다. */
+    @Test
+    fun selectMealTimeTab(): Unit = runBlocking {
+        val view: DailyMealView = mockk()
+
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns DailyMeal(
+            breakfast = mockk(),
+            lunch = mockk(),
+            dinner = mockk(),
+            savedTime = timePoint
+        )
+
+        // 현재 선택된 탭이 아침 탭이면 아침 탭을 선택해야 한다.
+        Config.mealTime.send(MealTime.BREAKFAST)
+        DailyMealPresenter(view, timePoint)
+        verify { view.selectMealTimeTab(MealTime.BREAKFAST) }
+        verify(exactly = 0) { view.selectMealTimeTab(MealTime.LUNCH) }
+        verify(exactly = 0) { view.selectMealTimeTab(MealTime.DINNER) }
+
+        clearMocks(view)
+
+        // 현재 선택된 탭이 점심 탭이면 점심 탭을 선택해야 한다.
+        Config.mealTime.send(MealTime.LUNCH)
+        DailyMealPresenter(view, timePoint)
+        verify(exactly = 0) { view.selectMealTimeTab(MealTime.BREAKFAST) }
+        verify { view.selectMealTimeTab(MealTime.LUNCH) }
+        verify(exactly = 0) { view.selectMealTimeTab(MealTime.DINNER) }
+
+        clearMocks(view)
+
+        // 현재 선택된 탭이 저녁 탭이면 저녁 탭을 선택해야 한다.
+        Config.mealTime.send(MealTime.DINNER)
+        DailyMealPresenter(view, timePoint)
+        verify(exactly = 0) { view.selectMealTimeTab(MealTime.BREAKFAST) }
+        verify(exactly = 0) { view.selectMealTimeTab(MealTime.LUNCH) }
+        verify { view.selectMealTimeTab(MealTime.DINNER) }
+    }
+
     /** 설정된 학교가 없을 때 */
     @Test
     fun noSchool(): Unit = runBlocking {
