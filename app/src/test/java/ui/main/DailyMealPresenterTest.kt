@@ -150,6 +150,58 @@ class DailyMealPresenterTest {
         verify { view.selectOriginMode(mockDailyMeal.lunch!!.origin!!) }
     }
 
+    /** 식사 시간 탭을 올바르게 보여주는지 검사한다. */
+    @Test
+    fun showMealTimeTab() {
+        val view: DailyMealView = mockk()
+
+        // 점심 정보만 존재할 때
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns DailyMeal(
+            lunch = mockk(),
+            savedTime = timePoint
+        )
+
+        DailyMealPresenter(view, timePoint)
+
+        // 점심 탭만 표시되어야 한다.
+        verify { view.showMealTimeTab(MealTime.BREAKFAST, visible = false) }
+        verify { view.showMealTimeTab(MealTime.LUNCH, visible = true) }
+        verify { view.showMealTimeTab(MealTime.DINNER, visible = false) }
+
+        clearMocks(view)
+
+        // 점심, 저녁 정보만 존재할 때
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns DailyMeal(
+            lunch = mockk(),
+            dinner = mockk(),
+            savedTime = timePoint
+        )
+
+        DailyMealPresenter(view, timePoint)
+
+        // 점심, 저녁 탭만 표시되어야 한다.
+        verify { view.showMealTimeTab(MealTime.BREAKFAST, visible = false) }
+        verify { view.showMealTimeTab(MealTime.LUNCH, visible = true) }
+        verify { view.showMealTimeTab(MealTime.DINNER, visible = true) }
+
+        clearMocks(view)
+
+        // 아침, 점심, 저녁 정보 모두 존재할 때
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns DailyMeal(
+            breakfast = mockk(),
+            lunch = mockk(),
+            dinner = mockk(),
+            savedTime = timePoint
+        )
+
+        DailyMealPresenter(view, timePoint)
+
+        // 모든 탭이 표시되어야 한다.
+        verify { view.showMealTimeTab(MealTime.BREAKFAST, visible = true) }
+        verify { view.showMealTimeTab(MealTime.LUNCH, visible = true) }
+        verify { view.showMealTimeTab(MealTime.DINNER, visible = true) }
+    }
+
     /** 설정된 학교가 없을 때 */
     @Test
     fun noSchool(): Unit = runBlocking {
