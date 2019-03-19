@@ -115,6 +115,41 @@ class DailyMealPresenterTest {
         verify { view.showModeButton(DailyMealView.Mode.ORIGIN, visible = true) }
     }
 
+    /** 올바른 보기 모드를 선택하는지 검사한다. */
+    @Test
+    fun selectMode(): Unit = runBlocking {
+        val view: DailyMealView = mockk()
+
+        val mockDailyMeal = DailyMeal(
+            lunch = Meal(
+                dishes = emptyList(),
+                nutrient = mockk(),
+                origin = emptyMap()
+            ),
+            savedTime = timePoint
+        )
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns mockDailyMeal
+
+        // 현재 선택된 보기 모드가 급식 메뉴 보기 모드이면 급식 메뉴 보기 모드를 선택해야 한다.
+        Config.dailyMealViewMode.send(DailyMealView.Mode.MEAL_MENU)
+        DailyMealPresenter(view, timePoint)
+        verify { view.selectMealMenuMode(mockDailyMeal.lunch!!.dishes) }
+
+        clearMocks(view)
+
+        // 현재 선택된 보기 모드가 영양 정보 보기 모드이면 영양 정보 보기 모드를 선택해야 한다.
+        Config.dailyMealViewMode.send(DailyMealView.Mode.NUTRIENT)
+        DailyMealPresenter(view, timePoint)
+        verify { view.selectNutrientMode(mockDailyMeal.lunch!!.nutrient!!) }
+
+        clearMocks(view)
+
+        // 현재 선택된 보기 모드가 원산지 정보 보기 모드이면 원산지 정보 보기 모드를 선택해야 한다.
+        Config.dailyMealViewMode.send(DailyMealView.Mode.ORIGIN)
+        DailyMealPresenter(view, timePoint)
+        verify { view.selectOriginMode(mockDailyMeal.lunch!!.origin!!) }
+    }
+
     /** 설정된 학교가 없을 때 */
     @Test
     fun noSchool(): Unit = runBlocking {
