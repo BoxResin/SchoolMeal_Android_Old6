@@ -9,6 +9,7 @@ import org.junit.Test
 import winapi251.app.schoolmeal.Config
 import winapi251.app.schoolmeal.datetime.TimePoint
 import winapi251.app.schoolmeal.model.meal.DailyMeal
+import winapi251.app.schoolmeal.model.meal.Meal
 
 @ExperimentalCoroutinesApi
 class DailyMealPresenterTest {
@@ -36,6 +37,82 @@ class DailyMealPresenterTest {
         DailyMealPresenter(view, timePoint)
 
         verify { view.setDateText("3월 5일 (화)") }
+    }
+
+    /** 보기 모드 버튼을 올바르게 보여주는지 검사한다. */
+    @Test
+    fun showModeButton() {
+        val view: DailyMealView = mockk()
+
+        // 급식 메뉴 정보만 존재할 때
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns DailyMeal(
+            lunch = Meal(
+                dishes = emptyList()
+            ),
+            savedTime = timePoint
+        )
+
+        DailyMealPresenter(view, timePoint)
+
+        // 급식 메뉴 보기 모드 버튼만 표시되어야 한다.
+        verify { view.showModeButton(DailyMealView.Mode.MEAL_MENU, visible = true) }
+        verify { view.showModeButton(DailyMealView.Mode.NUTRIENT, visible = false) }
+        verify { view.showModeButton(DailyMealView.Mode.ORIGIN, visible = false) }
+
+        clearMocks(view)
+
+        // 급식 메뉴 정보와 영양 정보만 존재할 때
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns DailyMeal(
+            lunch = Meal(
+                dishes = emptyList(),
+                nutrient = mockk()
+            ),
+            savedTime = timePoint
+        )
+
+        DailyMealPresenter(view, timePoint)
+
+        // 급식 메뉴 및 영양 정보 보기 모드 버튼만 표시되어야 한다.
+        verify { view.showModeButton(DailyMealView.Mode.MEAL_MENU, visible = true) }
+        verify { view.showModeButton(DailyMealView.Mode.NUTRIENT, visible = true) }
+        verify { view.showModeButton(DailyMealView.Mode.ORIGIN, visible = false) }
+
+        clearMocks(view)
+
+        // 급식 메뉴 정보와 원산지 정보만 존재할 때
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns DailyMeal(
+            lunch = Meal(
+                dishes = emptyList(),
+                origin = emptyMap()
+            ),
+            savedTime = timePoint
+        )
+
+        DailyMealPresenter(view, timePoint)
+
+        // 급식 메뉴 및 원산지 정보 보기 모드 버튼만 표시되어야 한다.
+        verify { view.showModeButton(DailyMealView.Mode.MEAL_MENU, visible = true) }
+        verify { view.showModeButton(DailyMealView.Mode.NUTRIENT, visible = false) }
+        verify { view.showModeButton(DailyMealView.Mode.ORIGIN, visible = true) }
+
+        clearMocks(view)
+
+        // 모든 정보가 존재할 때
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns DailyMeal(
+            lunch = Meal(
+                dishes = emptyList(),
+                nutrient = mockk(),
+                origin = emptyMap()
+            ),
+            savedTime = timePoint
+        )
+
+        DailyMealPresenter(view, timePoint)
+
+        // 모든 보기 모드 버튼이 표시되어야 한다.
+        verify { view.showModeButton(DailyMealView.Mode.MEAL_MENU, visible = true) }
+        verify { view.showModeButton(DailyMealView.Mode.NUTRIENT, visible = true) }
+        verify { view.showModeButton(DailyMealView.Mode.ORIGIN, visible = true) }
     }
 
     /** 설정된 학교가 없을 때 */
