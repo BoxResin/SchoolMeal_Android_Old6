@@ -10,6 +10,7 @@ import winapi251.app.schoolmeal.Config
 import winapi251.app.schoolmeal.datetime.TimePoint
 import winapi251.app.schoolmeal.model.meal.DailyMeal
 import winapi251.app.schoolmeal.model.meal.Meal
+import winapi251.app.schoolmeal.model.school.School
 
 @ExperimentalCoroutinesApi
 class DailyMealPresenterTest {
@@ -290,5 +291,18 @@ class DailyMealPresenterTest {
                 onClick = presenter::onClickDownloadInSnackBar
             )
         }
+    }
+
+    /** 학교가 변경되었을 때 */
+    @Test
+    fun onSchoolChanged(): Unit = runBlocking {
+        val view: DailyMealView = mockk()
+        DailyMealPresenter(view, timePoint)
+
+        val newSchool: School = mockk()
+        Config.school.send(newSchool)
+
+        // 급식 정보를 새로 로딩해야 한다.
+        verify { MealDatabase.load(newSchool, timePoint) }
     }
 }
