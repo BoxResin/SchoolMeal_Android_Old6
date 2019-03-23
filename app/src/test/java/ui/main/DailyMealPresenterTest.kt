@@ -268,6 +268,37 @@ class DailyMealPresenterTest {
         coVerify { Config.dailyMealViewMode.send(DailyMealView.Mode.ORIGIN) }
     }
 
+    /** 식사 시간 탭이 선택될 때 올바른 동작을 하는지 검사한다. */
+    @Test
+    fun onSelectMealTimeTab() {
+        val mockDailyMeal = DailyMeal(
+            breakfast = Meal(
+                dishes = emptyList()
+            ),
+            lunch = Meal(
+                dishes = emptyList()
+            ),
+            dinner = Meal(
+                dishes = emptyList()
+            ),
+            savedTime = timePoint
+        )
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns mockDailyMeal
+
+        val view: DailyMealView = mockk()
+        val presenter = DailyMealPresenter(view, timePoint)
+
+        // 아침 탭이 선택되면 해당 정보를 보여주고 설정을 동기화해야 한다.
+        presenter.onSelectMealTimeTab(MealTime.BREAKFAST)
+        verify { view.selectMealMenuMode(mockDailyMeal.breakfast!!.dishes) }
+        coVerify { Config.mealTime.send(MealTime.BREAKFAST) }
+
+        // 저녁 탭이 선택되면 해당 정보를 보여주고 설정을 동기화해야 한다.
+        presenter.onSelectMealTimeTab(MealTime.DINNER)
+        verify { view.selectMealMenuMode(mockDailyMeal.dinner!!.dishes) }
+        coVerify { Config.mealTime.send(MealTime.DINNER) }
+    }
+
     /** 설정된 학교가 없을 때 */
     @Test
     fun noSchool(): Unit = runBlocking {
