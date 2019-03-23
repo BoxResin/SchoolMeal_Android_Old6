@@ -11,6 +11,7 @@ import winapi251.app.schoolmeal.datetime.TimePoint
 import winapi251.app.schoolmeal.model.meal.DailyMeal
 import winapi251.app.schoolmeal.model.meal.Meal
 import winapi251.app.schoolmeal.model.meal.MealDatabase
+import winapi251.app.schoolmeal.model.meal.MealRemoteSource
 import winapi251.app.schoolmeal.model.school.School
 
 @ExperimentalCoroutinesApi
@@ -298,6 +299,38 @@ class DailyMealPresenterTest {
         presenter.onSelectMealTimeTab(MealTime.DINNER)
         verify { view.selectMealMenuMode(mockDailyMeal.dinner!!.dishes) }
         coVerify { Config.mealTime.send(MealTime.DINNER) }
+    }
+
+    /** 오류창에서 다운로드 버튼을 클릭할 때 올바른 동작을 하는지 검사한다. */
+    @Test
+    fun onClickDownloadInError() {
+        val view: DailyMealView = mockk()
+        val presenter = DailyMealPresenter(view, timePoint)
+
+        // 다운로드 중 에러가 발생하면 오류창을 보여줘야 한다.
+        coEvery { MealRemoteSource.download(Config.school.value!!, timePoint) } throws Exception()
+        presenter.onClickDownloadInError()
+        verify {
+            view.showError(
+                message = "오류 발생",
+                buttonText = "다시 시도",
+                onClick = presenter::onClickDownloadInError
+            )
+        }
+
+        // 다운로드 중 에러가 발생하지 않았으면 로컬 데이터베이스에 저장하고 급식 정보를 보여줘야 한다.
+        val mockDailyMeals: List<DailyMeal> = listOf(
+            DailyMeal(
+                lunch = Meal(
+                    dishes = emptyList()
+                ),
+                savedTime = timePoint
+            )
+        )
+        coEvery { MealRemoteSource.download(Config.school.value!!, timePoint) } returns mockDailyMeals
+        presenter.onClickDownloadInError()
+        verify { MealDatabase.save(Config.school.value!!, mockDailyMeals) }
+        verify { view.selectMealMenuMode(mockDailyMeals[0].lunch!!.dishes) }
     }
 
     /** 설정된 학교가 없을 때 */
