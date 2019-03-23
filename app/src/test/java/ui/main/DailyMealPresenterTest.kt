@@ -334,4 +334,37 @@ class DailyMealPresenterTest {
         // 해당 보기 모드를 선택해야 한다.
         verify { view.selectOriginMode(mockDailyMeal.lunch!!.origin!!) }
     }
+
+    /** 식사 시간 설정이 변경되었을 때 */
+    @Test
+    fun onMealTimeConfigChanged(): Unit = runBlocking {
+        val mockDailyMeal = DailyMeal(
+            breakfast = Meal(
+                dishes = emptyList()
+            ),
+            lunch = Meal(
+                dishes = emptyList()
+            ),
+            dinner = Meal(
+                dishes = emptyList()
+            ),
+            savedTime = timePoint
+        )
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns mockDailyMeal
+
+        val view: DailyMealView = mockk()
+        DailyMealPresenter(view, timePoint)
+
+        // 식사 시간이 아침으로 바뀌면
+        Config.mealTime.send(MealTime.BREAKFAST)
+
+        // 해당 식사 시간 탭을 선택해야 한다.
+        verify { view.selectMealTimeTab(MealTime.BREAKFAST) }
+
+        // 식사 시간이 저녁으로 바뀌면
+        Config.mealTime.send(MealTime.DINNER)
+
+        // 해당 식사 시간 탭을 선택해야 한다.
+        verify { view.selectMealTimeTab(MealTime.DINNER) }
+    }
 }
