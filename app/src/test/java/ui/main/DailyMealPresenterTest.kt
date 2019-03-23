@@ -10,6 +10,7 @@ import winapi251.app.schoolmeal.Config
 import winapi251.app.schoolmeal.datetime.TimePoint
 import winapi251.app.schoolmeal.model.meal.DailyMeal
 import winapi251.app.schoolmeal.model.meal.Meal
+import winapi251.app.schoolmeal.model.meal.MealDatabase
 import winapi251.app.schoolmeal.model.school.School
 
 @ExperimentalCoroutinesApi

@@ -1,7 +1,6 @@
-package winapi251.app.schoolmeal.ui.main
+package winapi251.app.schoolmeal.model.meal
 
 import winapi251.app.schoolmeal.datetime.TimePoint
-import winapi251.app.schoolmeal.model.meal.DailyMeal
 import winapi251.app.schoolmeal.model.school.School
 
 /**
