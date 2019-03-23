@@ -305,4 +305,33 @@ class DailyMealPresenterTest {
         // 급식 정보를 새로 로딩해야 한다.
         verify { MealDatabase.load(newSchool, timePoint) }
     }
+
+    /** 보기 모드 설정이 변경되었을 때 */
+    @Test
+    fun onViewModeConfigChanged(): Unit = runBlocking {
+        val mockDailyMeal = DailyMeal(
+            lunch = Meal(
+                dishes = emptyList(),
+                nutrient = mockk(),
+                origin = emptyMap()
+            ),
+            savedTime = timePoint
+        )
+        every { MealDatabase.load(Config.school.value!!, timePoint) } returns mockDailyMeal
+
+        val view: DailyMealView = mockk()
+        DailyMealPresenter(view, timePoint)
+
+        // 보기 모드 설정이 영양 정보 보기 모드로 바뀌면
+        Config.dailyMealViewMode.send(DailyMealView.Mode.NUTRIENT)
+
+        // 해당 보기 모드를 선택해야 한다.
+        verify { view.selectNutrientMode(mockDailyMeal.lunch!!.nutrient!!) }
+
+        // 보기 모드 설정이 원산지 정보 보기 모드로 바뀌면
+        Config.dailyMealViewMode.send(DailyMealView.Mode.ORIGIN)
+
+        // 해당 보기 모드를 선택해야 한다.
+        verify { view.selectOriginMode(mockDailyMeal.lunch!!.origin!!) }
+    }
 }
